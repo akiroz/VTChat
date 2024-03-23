@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "koa": "^2.15.2",
+    "koa-bodyparser": "^4.4.1",
+    "koa-compress": "^5.1.1",
+    "masterchat": "^1.1.0",
+    "pg-boss": "^9.0.3",
+    "pg-promise": "^11.5.5",
+    "youtubei.js": "^9.1.0"
+  }
+}

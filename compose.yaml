@@ -1,0 +1,7 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+  main:
+    build: .
+    ports:
+      - "3000:3000"
