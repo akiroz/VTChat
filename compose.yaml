@@ -1,7 +1,19 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: groonga/pgroonga:3.1.9-alpine-16-slim
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/10_init.sql:ro
+    environment:
+      POSTGRES_PASSWORD: postgres
   main:
     build: .
+    init: true
+    restart: always
     ports:
       - "3000:3000"
+    env_file:
+      - .env

@@ -1,0 +1,42 @@
+{
+    "scripts": {
+        "start": "vite",
+        "build": "vite build",
+        "start-console": "APP=console vite",
+        "build-console": "APP=console vite build"
+    },
+    "dependencies": {
+        "@emotion/react": "^11.11.4",
+        "@emotion/styled": "^11.11.0",
+        "@fontsource/roboto": "^5.0.12",
+        "@mui/icons-material": "^5.15.14",
+        "@mui/material": "^5.15.14",
+        "@mui/x-data-grid": "^7.1.0",
+        "@mui/x-date-pickers": "^7.1.0",
+        "date-fns": "^3.6.0",
+        "dset": "^3.1.3",
+        "i18next": "^23.10.1",
+        "i18next-browser-languagedetector": "^7.2.1",
+        "immer": "^10.0.4",
+        "notistack": "^3.0.1",
+        "numeral": "^2.0.6",
+        "react": "^18.2.0",
+        "react-async-hook": "^4.0.0",
+        "react-dom": "^18.2.0",
+        "react-i18next": "^14.1.0",
+        "react-router-dom": "^6.22.3",
+        "react-youtube": "^10.1.0",
+        "suspend-react": "^0.1.3",
+        "use-debounce": "^10.0.0"
+    },
+    "devDependencies": {
+        "@types/numeral": "^2.0.5",
+        "@types/react": "^18.2.73",
+        "@types/react-dom": "^18.2.23",
+        "@types/youtube-player": "^5.5.11",
+        "@vitejs/plugin-react": "^4.2.1",
+        "typescript": "^5.4.3",
+        "vite": "^5.2.7",
+        "vite-tsconfig-paths": "^4.3.2"
+    }
+}

@@ -1,3 +1,5 @@
+/frontend/dist*
+
 # Logs
 logs
 *.log
