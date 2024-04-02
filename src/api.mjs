@@ -234,7 +234,10 @@ export async function init() {
         }
 
         await updateChannelInfo(channels);
-        if(containsTagUpdates) cachedTags = null;
+        if(containsTagUpdates) {
+            cachedTags = null;
+            log.info("cached tags cleared");
+        }
         ctx.body = null;
     });
 

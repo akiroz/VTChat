@@ -57,7 +57,7 @@ export async function updateChannelInfo(channels) {
             .insert({
                 id, nameNative, nameAll, thumbnail, uploadList,
                 tags: tags || {},
-                active: active || true
+                active: (typeof active === "boolean")? active: true
             })
             .onConflict("id").merge({
                 nameNative, nameAll, thumbnail, uploadList,
