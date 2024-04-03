@@ -37,7 +37,8 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 }));
 
 export default function ChannelView() {
-    const { tags: allTags, counts } = API.stats();
+    const stats = API.stats();
+    const { tags: allTags } = API.tags();
     const [pagination, setPagination] = useState({ pageSize: 10, page: 0 });
 
     const [q, setQ] = useState("");
@@ -302,7 +303,7 @@ export default function ChannelView() {
                     loading={data.loading}
                     getRowClassName={({ id }) => (id in dirty && id !== editingRow) ? "vtchat-theme--edited" : ""}
                     pageSizeOptions={[pagination.pageSize]}
-                    rowCount={counts.channel}
+                    rowCount={stats.count.channel}
                     paginationMode="server"
                     paginationModel={pagination}
                     onPaginationModelChange={setPagination}

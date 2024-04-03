@@ -37,11 +37,20 @@ const channels = {
     "UC9VqnG2Yx--wWitfHvJRe9A": {}, // @user-qf6rg6su2h
 };
 
-await fetch("https://vtchat.akiroz.life/mgnt/channels", {
+// await fetch("https://vtchat.akiroz.life/mgnt/channels", {
+//     method: "POST",
+//     body: JSON.stringify({ channels }),
+//     headers: {
+//         "Content-Type": "application/json",
+//         "Authorization": `Basic ${Buffer.from(process.env.VTCHAT_MGNT_KEY + ":").toString("base64")}`
+//     }
+// });
+
+await fetch("http://localhost:3000/mgnt/channels", {
     method: "POST",
     body: JSON.stringify({ channels }),
     headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${Buffer.from(process.env.VTCHAT_MGNT_KEY + ":").toString("base64")}`
+        "Authorization": `Basic ${Buffer.from("admin:").toString("base64")}`
     }
 });

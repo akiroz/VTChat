@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         },
         server: {
             proxy: {
+                "/mgnt/stats": 'http://localhost:3000',
                 "/mgnt/jobs": 'http://localhost:3000',
                 "/mgnt/channels": 'http://localhost:3000',
             }

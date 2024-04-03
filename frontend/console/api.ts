@@ -3,29 +3,46 @@ import { suspend, peek } from "suspend-react";
 
 declare const __VTCHAT_API_BASE__: string;
 
-export function url(endpoint: string) {
+function apiUrl(endpoint: string) {
     return (new URL(endpoint, __VTCHAT_API_BASE__)).toString();
 }
 
 const initSym = Symbol();
 
-export function stats({ refetch = false } = {}): {
-    counts: {
-        channel: number,
-        job: number,
-        msg: number,
-    },
+export function tags({ refetch = false } = {}): {
     tags: string[],
     k: Symbol,
     reload: () => void,
 } {
     const [k, setK] = useState<Symbol>(initSym);
     const [pk, setPk] = useState<Symbol>(initSym);
+    const path = "/api/tags";
     const data = suspend(() => {
-        return fetch(url("/api/stats")).then(r => r.json())
+        return fetch(apiUrl(path)).then(r => r.json())
             .then(d => (setPk(k), d))
-            .catch(err => refetch? Promise.resolve(peek([pk, "api/stats"])): Promise.reject(err));
-    }, [k, "api/stats"]);
+            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
+    }, [k, path]);
+    return { ...data, k, reload: () => setK(Symbol()) }
+}
+
+export function stats({ refetch = false } = {}): {
+    size: { db: bigint }
+    count: {
+        channel: number,
+        job: number,
+        msg: number,
+    },
+    k: Symbol,
+    reload: () => void,
+} {
+    const [k, setK] = useState<Symbol>(initSym);
+    const [pk, setPk] = useState<Symbol>(initSym);
+    const path = "/mgnt/stats";
+    const data = suspend(() => {
+        return fetch(path).then(r => r.json())
+            .then(d => (setPk(k), d))
+            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
+    }, [k, path]);
     return { ...data, k, reload: () => setK(Symbol()) }
 }
 
@@ -36,7 +53,7 @@ export async function csearch(params: { q?: string, limit?: number, offset?: num
     tags: { [tag: string]: 1 },
     active: boolean,
 }>> {
-    const resp = await fetch(url("/api/csearch"), {
+    const resp = await fetch(apiUrl("/api/csearch"), {
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
@@ -76,11 +93,12 @@ export function jobs({ refetch = false } = {}): {
 } {
     const [k, setK] = useState<Symbol>(initSym);
     const [pk, setPk] = useState<Symbol>(initSym);
+    const path = "/mgnt/jobs";
     const data = suspend(() => {
-        return fetch("/mgnt/jobs").then(r => r.json())
+        return fetch(path).then(r => r.json())
             .then(d => (setPk(k), d))
-            .catch(err => refetch? Promise.resolve(peek([pk, "mgnt/jobs"])): Promise.reject(err));
-    }, [k, "mgnt/jobs"]);
+            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
+    }, [k, path]);
     return { ...data, k, reload: () => setK(Symbol()) }
 }
 

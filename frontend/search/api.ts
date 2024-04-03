@@ -6,7 +6,7 @@ export function url(endpoint: string) {
 }
 
 export async function tags(): Promise<string[]> {
-    const resp = await fetch(url("/api/stats"));
+    const resp = await fetch(url("/api/tags"));
     if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
     return (await resp.json()).tags;
 }

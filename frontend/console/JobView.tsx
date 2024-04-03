@@ -158,8 +158,9 @@ export default function JobView() {
                         <Box sx={{ flex: 1 }} />
                         <Typography variant="caption" align="left" color="GrayText" sx={{ justifySelf: "flex-end" }}>
                             <code>
-                                Jobs: {numeral(stats.counts.job).format("0a")}<br />
-                                Msgs: {numeral(stats.counts.msg).format("0a")}
+                                Job/Msgs: {numeral(stats.count.job).format("0a")}/{numeral(stats.count.msg).format("0a")}
+                                <br />
+                                Size: {numeral(stats.size.db).format("0.0b")}
                             </code>
                         </Typography>
                     </Stack>

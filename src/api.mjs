@@ -189,17 +189,24 @@ export async function init() {
         };
     });
 
-    api.get("/stats", async ctx => {
-        const { count: channelCount } = await db.one(`select count(*)::int from "channel"`);
+    api.get("/tags", async ctx => {
+        ctx.body = {
+            tags: Object.keys(await getTags()),
+        };
+    });
+
+    mgnt.get("/stats", async ctx => {
+        const { dbSize } = await db.one(`select pg_database_size('livechat') as "dbSize"`);
+        const { channelCount } = await db.one(`select count(*)::int as "channelCount" from "channel"`);
         const { reltuples: jobCount } = await db.one(`select reltuples from pg_class where oid = to_regclass('public.job')`);
         const { reltuples: msgCount } = await db.one(`select reltuples from pg_class where oid = to_regclass('public.msg')`);
         ctx.body = {
-            counts: {
+            size: { db: dbSize },
+            count: {
                 channel: channelCount,
                 job: Math.max(jobCount, 0),
                 msg: Math.max(msgCount, 0),
-            },
-            tags: Object.keys(await getTags()),
+            }
         };
     });
 
