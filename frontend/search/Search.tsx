@@ -37,7 +37,7 @@ export default function Search() {
     const [chQuery2] = useDebounce(chQuery, 800);
     const channels = useAsync(csearch, [chQuery2]);
 
-    const [search, setSearch] = useState<{ q: string, ch?: string, tag?: string, before?: number }>({ q: "" });
+    const [search, setSearch] = useState<{ q: string, ch?: string, tag?: string, weekOf?: number }>({ q: "" });
 
     return (
         <Stack alignItems="center" justifyContent="center" spacing={1} sx={{ height: "100%" }}>
@@ -48,8 +48,8 @@ export default function Search() {
                 <TextField label={t("keyword")} sx={{ width: "100%" }} value={search.q}
                     onChange={e => setSearch({ ...search, q: e.target.value })} />
                 <Button variant="contained" disabled={search.q.length < 2} onClick={() => {
-                    const { before, ...rest } = search;
-                    const params = { ...rest, ...(Number.isInteger(before)? { bf: String(before) }: {}) };
+                    const { weekOf, ...rest } = search;
+                    const params = { ...rest, ...(Number.isInteger(weekOf)? { wk: String(weekOf) }: {}) };
                     navigate({ pathname: "/search", search: createSearchParams(params).toString() });
                 }}>
                     {t("search")}
@@ -91,9 +91,9 @@ export default function Search() {
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                             sx={{ marginTop: 2 }}
-                            value={search.before ? new Date(search.before * 1000) : null}
-                            onChange={(val) => setSearch({ ...search, before: Math.floor(val.getTime() / 1000) })}
-                            label={t("beforeDate")}
+                            value={search.weekOf ? new Date(search.weekOf) : null}
+                            onChange={(val) => setSearch({ ...search, weekOf: val.getTime() })}
+                            label={t("weekOf")}
                         />
                     </LocalizationProvider>
                 </AccordionDetails>

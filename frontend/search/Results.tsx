@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { enqueueSnackbar } from "notistack";
 import YTPlayer from "react-youtube";
 import numeral from "numeral";
+import * as  DateFns from "date-fns";
 
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -24,6 +25,8 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import ChatIcon from "@mui/icons-material/Chat";
 import VoiceChatIcon from "@mui/icons-material/VoiceChat";
+import SkipNext from "@mui/icons-material/SkipNext";
+import SkipPrevious from "@mui/icons-material/SkipPrevious";
 
 import * as API from "./api";
 
@@ -52,18 +55,22 @@ export default function Results() {
             q: qs.get("q"),
             ch: qs.get("ch"),
             tags: qs.has("tag") ? { [qs.get("tag")]: 1 } : null,
-            before: qs.has("bf") ? Number(qs.get("bf")) : null,
-            offset: qs.has("p") ? Number(qs.get("p")) : null,
+            weekOf: qs.has("wk") ? Number(qs.get("wk")) : null,
+            offset: qs.has("o") ? Number(qs.get("o")) : null,
             limit: pageSize,
         };
-        const page = Number.isInteger(r.offset)? r.offset: 0;
         if (!(r.q?.length > 1)) return null;
         if (!r.ch) delete r.ch;
         if (!r.tags) delete r.tags;
-        if (!Number.isInteger(r.before)) delete r.before;
         if (!Number.isInteger(r.offset)) delete r.offset;
-        else r.offset *= pageSize;
-        return [r, page];
+        r.weekOf = DateFns.startOfWeek(Number.isInteger(r.weekOf)? r.weekOf: Date.now(), { weekStartsOn: 1 }).getTime();
+        return [r, {
+            n: Math.floor((r.offset || 0) / pageSize) + 1,
+            y: DateFns.getYear(r.weekOf),
+            m: DateFns.getMonth(r.weekOf) + 1,
+            mmm: DateFns.format(r.weekOf, "MMM"),
+            w: DateFns.getISOWeek(r.weekOf),
+        }];
     }, [qs]);
 
     if (!req) {
@@ -95,23 +102,56 @@ export default function Results() {
             <AppBar>
                 <Toolbar>
                     <IconButton sx={{ mr: 2 }} onClick={() => navigate("/")}><HomeIcon /></IconButton>
-                    <IconButton sx={{ mr: 1 }} disabled={!req.offset} onClick={() => {
+                    <IconButton sx={{ mr: 1 }} onClick={() => {
                         const qs2 = new URLSearchParams(qs);
-                        qs2.set("p", String(Math.max(0, page - 1)));
+                        qs2.delete("o");
+                        const prev = DateFns.previousMonday(req.weekOf);
+                        qs2.set("wk", String(prev.getTime()));
+                        setQs(qs2);
+                    }}>
+                        <SkipPrevious />
+                    </IconButton>
+                    <IconButton sx={{ mr: 1 }} onClick={() => {
+                        const qs2 = new URLSearchParams(qs);
+                        if((search.result?.length || 0) >= pageSize) {
+                            qs2.set("o", String((req.offset || 0) + pageSize));
+                        } else {
+                            qs2.delete("o");
+                            const prev = DateFns.previousMonday(req.weekOf);
+                            qs2.set("wk", String(prev.getTime()));
+                        }
                         setQs(qs2);
                     }}>
                         <NavigateBeforeIcon />
                     </IconButton>
-                    <Chip sx={{ mr: 1 }} label={t("page", { n: page + 1 })}/>
-                    <IconButton sx={{ mr: 2 }} disabled={(search.result?.length || 0) < pageSize} onClick={() => {
+                    <Chip sx={{ mr: 1 }} label={t("page", page)}/>
+                    <IconButton sx={{ mr: 1 }} disabled={(
+                        !req.offset &&
+                        DateFns.isFuture(DateFns.endOfWeek(req.weekOf, { weekStartsOn: 1 }))
+                    )} onClick={() => {
                         const qs2 = new URLSearchParams(qs);
-                        qs2.set("p", String(page + 1));
+                        if(req.offset) {
+                            qs2.set("o", String(Math.max(0, (req.offset || 0) - pageSize)));
+                        } else {
+                            qs2.delete("o");
+                            const next = DateFns.nextMonday(req.weekOf);
+                            qs2.set("wk", String(next.getTime()));
+                        }
                         setQs(qs2);
                     }}>
                         <NavigateNextIcon />
                     </IconButton>
+                    <IconButton sx={{ mr: 2 }} disabled={DateFns.isFuture(DateFns.endOfWeek(req.weekOf, { weekStartsOn: 1 }))} onClick={() => {
+                        const qs2 = new URLSearchParams(qs);
+                        qs2.delete("o");
+                        const next = DateFns.nextMonday(req.weekOf);
+                        qs2.set("wk", String(next.getTime()));
+                        setQs(qs2);
+                    }}>
+                        <SkipNext />
+                    </IconButton>
                     <TextField
-                        size="small" sx={{ mr: 2, flex: 1 }} defaultValue={req.q} InputProps={{ readOnly: true }}
+                        size="small" sx={{ flex: 1 }} defaultValue={req.q} InputProps={{ readOnly: true }}
                         label={t("result", { n: search.result?.length || 0 })} />
                 </Toolbar>
             </AppBar>

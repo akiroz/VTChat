@@ -26,12 +26,12 @@ i18next.use(LanguageDetector).use(initReactI18next).init({
                 search: "Search",
                 advancedSearch: "Advanced Search",
                 channel: "Channel",
-                beforeDate: "Before Date",
+                weekOf: "Results within week of",
                 tags: "Tags",
                 desc: "Search chat messages in VTuber livestreams",
                 noResult: "No results found.",
                 result: "Showing {{n}} results for:",
-                page: "Page {{n}}"
+                page: "{{y}} Week {{w}} ({{mmm}}) Page {{n}}"
             },
         },
         ja: {
@@ -49,12 +49,12 @@ i18next.use(LanguageDetector).use(initReactI18next).init({
                 search: "検査",
                 advancedSearch: "検索オプション",
                 channel: "チャンネル",
-                beforeDate: "日付以前",
+                weekOf: "週間検索範囲",
                 tags: "タグ",
                 desc: "VTuber配信コメント検査",
                 noResult: "結果はありません。",
                 result: "ページ結果 {{n}} 件",
-                page: "ページ {{n}}"
+                page: "{{y}}週{{w}} ({{m}}月) ページ {{n}}"
             },
         },
     },

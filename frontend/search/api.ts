@@ -27,7 +27,7 @@ export async function csearch({ q }): Promise<Array<{
     return channels;
 }
 
-export async function search(params): Promise<Array<{
+export async function search({ weekOf, ...params }): Promise<Array<{
     type: "chat" | "transcript",
     video: string,
     channel: string,
@@ -38,7 +38,7 @@ export async function search(params): Promise<Array<{
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params),
+        body: JSON.stringify({...params, weekOf: weekOf/1000 }),
     });
     if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
     const { msgs } = await resp.json();
