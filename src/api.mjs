@@ -15,6 +15,7 @@ import mount from "koa-mount";
 import Ajv from "ajv";
 import Knex from "knex";
 import { makeWorkerUtils } from "graphile-worker";
+import { startOfWeek, endOfWeek } from "date-fns";
 
 import { db, workerDb } from "./db.mjs";
 import { yt, updateChannelInfo } from "./ingestion.mjs";
@@ -144,7 +145,7 @@ export async function init() {
                 type: "object", // Key = Tag
                 additionalProperties: { const: 1 }
             },
-            weekOf: { type: "integer" }, // Timestamp sec, automatically normalized to ISO week
+            weekOf: { type: "integer" }, // Timestamp sec, automatically normalized to week
             limit: { type: "integer", minimum: 1, maximum: 100 },
             offset: { type: "integer", minimum: 0 },
         },
@@ -152,17 +153,14 @@ export async function init() {
     }), async ctx => {
         const { q, ch, tags, weekOf = Math.floor(Date.now()/1000), limit = 100, offset = 0 } = ctx.request.body;
 
-        
-
         const b = knex("msg")
             .select("msg.type", "msg.video", "msg.channel", "msg.timecode", "msg.text")
             .whereRaw("msg.text &@ ?", q)
+            .whereBetween("timestamp", [startOfWeek(weekOf * 1000), endOfWeek(weekOf * 1000)])
             .orderBy("msg.timestamp", "desc").limit(limit).offset(offset)
 
-        if(ch) b.where({ "msg.channel": ch });
-        if(before) b.where("msg.timestamp", "<", new Date(before * 1000));
-
-        if(tags) {
+        if(ch) b.where({ "msg.channel": ch })
+        else if(tags) {
             b.join("channel", "msg.channel", "channel.id");
             b.where("channel.tags", "?&", Object.keys(tags));
         }
