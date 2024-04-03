@@ -46,11 +46,13 @@ const channels = {
 //     }
 // });
 
-await fetch("http://localhost:3000/mgnt/channels", {
+const resp = await fetch("http://localhost:3000/mgnt/channels", {
     method: "POST",
     body: JSON.stringify({ channels }),
     headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${Buffer.from("admin:").toString("base64")}`
+        "Authorization": `Basic ${Buffer.from(process.env.VTCHAT_MGNT_KEY + ":").toString("base64")}`
     }
 });
+
+if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);

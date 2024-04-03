@@ -15,13 +15,16 @@ export const yt = Youtube({ version: "v3", auth: process.env.VTCHAT_YT_KEY || ((
 
 /** @param {{ [idOrHandle: string]: { tags?: { [tag: string]: 1 }, active?: boolean } }} channels  */
 export async function updateChannelInfo(channels) {
+    /** @type {{ [id:string]: ReturnType<typeof parseResource> & typeof channels[string] }} */
     const channelById = {};
+    /** @type {{ [handle:string]: ReturnType<typeof parseResource> & typeof channels[string] }} */
     const channelByHandle = {};
     for (const [handleOrId, { tags, active }] of Object.entries(channels)) {
         if (handleOrId.startsWith("UC")) channelById[handleOrId] = { tags, active };
         if (handleOrId.startsWith("@")) channelByHandle[handleOrId] = { tags, active };
     }
 
+    /** @returns {{ id:string, nameNative:string, nameAll:string, thumbnail:string, uploadList:string }} */
     function parseResource(ch) {
         const id = ch?.id;
         const nameNative = ch?.snippet?.title;
@@ -36,12 +39,14 @@ export async function updateChannelInfo(channels) {
 
     const part = ["id", "snippet", "contentDetails", "localizations"];
     if (Object.keys(channelById).length > 0) {
+        /** @type {{ [id:string]: ReturnType<typeof parseResource> }} */
         const resourceById = {};
         const { data: { items = [] } } = await yt.channels.list({ id: Object.keys(channelById), part }, { http2: true });
         items.map(parseResource).forEach(({ id, ...info }) => resourceById[id] = info);
         for (const id of Object.keys(channelById)) {
             if (!resourceById[id]) throw Object.assign(Error("channel not found"), { id });
             channelById[id] = { ...channelById[id], ...resourceById[id] };
+            log.debug("parsed channel from id", { id, name: resourceById[id].nameNative });
         }
     }
     for (const handle of Object.keys(channelByHandle)) {
@@ -50,6 +55,7 @@ export async function updateChannelInfo(channels) {
         const { id, ...info } = parseResource(items[0]);
         log.info("resolved channel for handle", { channel: id, handle });
         channelById[id] = { ...channelByHandle[handle], ...info };
+        log.debug("parsed channel from handle", { handle, name: resourceById[id].nameNative });
     }
 
     for (const [id, { nameNative, nameAll, thumbnail, uploadList, tags, active }] of Object.entries(channelById)) {
