@@ -116,7 +116,7 @@ export async function init() {
             {
                 task: "scrapeTrigger",
                 match: "*/10 * * * *",
-                options: { maxAttempts: 1 }
+                options: { jobKey: "scrape", maxAttempts: 1 }
             }
         ]),
         taskList: {
@@ -126,7 +126,11 @@ export async function init() {
                     log.warn("no channel to scrape");
                     return;
                 }
-                await addJob("scrapeChannel", { channel: channel.id, uploadList: channel.uploadList }, { maxAttempts: 3 });
+                await addJob(
+                    "scrapeChannel",
+                    { channel: channel.id, uploadList: channel.uploadList },
+                    { jobKey: channel.id, maxAttempts: 3 }
+                );
             },
 
             /** @param {{ channel: string, uploadList: string }} payload */

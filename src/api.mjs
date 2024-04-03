@@ -282,7 +282,7 @@ export async function init() {
     }), async ctx => {
         const { scrape, channel, video } = ctx.request.body;
         if(scrape) {
-            await workerUtils.addJob("scrapeTrigger", {}, { maxAttempts: 1 });
+            await workerUtils.addJob("scrapeTrigger", {}, { jobKey: "scrape", maxAttempts: 1 });
         }
         if(channel) {
             const { uploadList } = (await db.oneOrNone(`select "uploadList" from "channel" where "id" = $1`, channel)) || {};
@@ -290,7 +290,7 @@ export async function init() {
                 ctx.throw(400, "Unknown channel");
                 return;
             }
-            await workerUtils.addJob("scrapeChannel", { channel, uploadList }, { maxAttempts: 1 });
+            await workerUtils.addJob("scrapeChannel", { channel, uploadList }, { jobKey: channel, maxAttempts: 1 });
         }
         if(video) {
             const { data: { items: [v] = [] } } = await yt.videos.list({ id: video, part: ["snippet", "liveStreamingDetails"] });
@@ -305,7 +305,7 @@ export async function init() {
                 ctx.throw(400, "Video from unknown channel")
                 return;
             }
-            await workerUtils.addJob("scrapeVideoChat", { video, channel, startTime }, { maxAttempts: 1, jobKey: video });
+            await workerUtils.addJob("scrapeVideoChat", { video, channel, startTime }, { jobKey: video, maxAttempts: 1 });
         }
         ctx.body = null;
     });
