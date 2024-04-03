@@ -1,49 +1,28 @@
-import { useState } from "react";
-import { suspend, peek } from "suspend-react";
-
 declare const __VTCHAT_API_BASE__: string;
 
 function apiUrl(endpoint: string) {
     return (new URL(endpoint, __VTCHAT_API_BASE__)).toString();
 }
 
-const initSym = Symbol();
-
-export function tags({ refetch = false } = {}): {
-    tags: string[],
-    k: Symbol,
-    reload: () => void,
-} {
-    const [k, setK] = useState<Symbol>(initSym);
-    const [pk, setPk] = useState<Symbol>(initSym);
-    const path = "/api/tags";
-    const data = suspend(() => {
-        return fetch(apiUrl(path)).then(r => r.json())
-            .then(d => (setPk(k), d))
-            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
-    }, [k, path]);
-    return { ...data, k, reload: () => setK(Symbol()) }
+export async function tags(): Promise<{ tags: string[] }> {
+    const resp = await fetch(apiUrl("/api/tags"));
+    if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
+    return resp.json();
 }
 
-export function stats({ refetch = false } = {}): {
-    size: { db: bigint }
+export async function stats(): Promise<{
+    size: {
+        db: string, // bigint
+    }
     count: {
         channel: number,
         job: number,
         msg: number,
     },
-    k: Symbol,
-    reload: () => void,
-} {
-    const [k, setK] = useState<Symbol>(initSym);
-    const [pk, setPk] = useState<Symbol>(initSym);
-    const path = "/mgnt/stats";
-    const data = suspend(() => {
-        return fetch(path).then(r => r.json())
-            .then(d => (setPk(k), d))
-            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
-    }, [k, path]);
-    return { ...data, k, reload: () => setK(Symbol()) }
+}> {
+    const resp = await fetch("/mgnt/stats");
+    if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
+    return resp.json();
 }
 
 export async function csearch(params: { q?: string, limit?: number, offset?: number }): Promise<Array<{
@@ -82,24 +61,16 @@ export type Job = {
     error?: string
 };
 
-export function jobs({ refetch = false } = {}): {
-    queueLength: number,
+export async function jobs(): Promise<{
+    queueLen: string, // bigint
     started: Job[],
     failed: Job[],
     queued: Job[],
     recent: Job[],
-    k: Symbol,
-    reload: () => void,
-} {
-    const [k, setK] = useState<Symbol>(initSym);
-    const [pk, setPk] = useState<Symbol>(initSym);
-    const path = "/mgnt/jobs";
-    const data = suspend(() => {
-        return fetch(path).then(r => r.json())
-            .then(d => (setPk(k), d))
-            .catch(err => refetch? Promise.resolve(peek([pk, path])): Promise.reject(err));
-    }, [k, path]);
-    return { ...data, k, reload: () => setK(Symbol()) }
+}> {
+    const resp = await fetch("/mgnt/jobs");
+    if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
+    return resp.json();
 }
 
 export async function submitJob(spec: { scrape: true } | { channel: string } | { video: string }) {

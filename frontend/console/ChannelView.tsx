@@ -37,13 +37,13 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 }));
 
 export default function ChannelView() {
-    const stats = API.stats();
-    const { tags: allTags } = API.tags();
+    const stats = useAsync(API.stats, []);
+    const tags = useAsync(API.tags, []);
     const [pagination, setPagination] = useState({ pageSize: 10, page: 0 });
 
     const [q, setQ] = useState("");
     const [q2] = useDebounce(q, 800);
-    const data = useAsync((q, { pageSize, page }) => {
+    const channels = useAsync((q, { pageSize, page }) => {
         return API.csearch({
             limit: pageSize,
             offset: page * pageSize,
@@ -52,8 +52,12 @@ export default function ChannelView() {
     }, [q2, pagination]);
 
     function reloadData() {
-        data.reset();
-        data.execute(...data.currentParams);
+        stats.reset();
+        stats.execute();
+        tags.reset();
+        tags.execute();
+        channels.reset();
+        channels.execute(...channels.currentParams);
     }
 
     const [editingRow, setEditingRow] = useState<string>(null);
@@ -85,11 +89,11 @@ export default function ChannelView() {
                     Add Channel
                 </Button>
             </Stack>
-            {data.error && (
+            {channels.error && (
                 <Paper elevation={3} variant="outlined">
                     <Stack spacing={3} justifyContent="center" alignItems="center" sx={{ height: 400 }}>
                         <Typography align="center">
-                            Failed to fetch channels<br />{data.error.message}
+                            Failed to fetch channels<br />{channels.error.message}
                         </Typography>
                         <Button variant="outlined" onClick={() => reloadData()}>
                             Reload
@@ -105,7 +109,7 @@ export default function ChannelView() {
                 <Card sx={{ width: 400, padding: 2 }} onClick={e => e.stopPropagation()}>
                     <CardContent>
                         <Autocomplete
-                            freeSolo options={allTags} value={newTag} clearOnBlur selectOnFocus
+                            freeSolo options={tags.result?.tags || []} value={newTag} clearOnBlur selectOnFocus
                             onChange={(_e, val) => setNewTag(val || "")}
                             renderInput={(params) => <TextField {...params} label="Enter new tag" />}
                         />
@@ -205,7 +209,7 @@ export default function ChannelView() {
                     <CircularProgress/>
                 )}
             </Backdrop>
-            {(data.loading || data.result) && (
+            {(channels.loading || channels.result) && (
                 <StyledDataGrid
                     columns={[
                         {
@@ -299,11 +303,11 @@ export default function ChannelView() {
                         }
                     ]}
                     autoHeight
-                    rows={data.result || []}
-                    loading={data.loading}
+                    rows={channels.result || []}
+                    loading={channels.loading}
                     getRowClassName={({ id }) => (id in dirty && id !== editingRow) ? "vtchat-theme--edited" : ""}
                     pageSizeOptions={[pagination.pageSize]}
-                    rowCount={stats.count.channel}
+                    rowCount={stats.result?.count.channel || 0}
                     paginationMode="server"
                     paginationModel={pagination}
                     onPaginationModelChange={setPagination}

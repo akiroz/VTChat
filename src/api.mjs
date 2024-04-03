@@ -258,9 +258,9 @@ export async function init() {
             const jobs = await db.manyOrNone(b.toQuery());
             return jobs.map(j => ({ ...j, lastUpdate: j.lastUpdate.getTime() }));
         }
-        const { count: queueLength } = await db.one(`select count(*) from "job" where "state" is null`);
+        const { count: queueLen } = await db.one(`select count(*) from "job" where "state" is null`);
         ctx.body = {
-            queueLength,
+            queueLen,
             started: await jobs(b => b.where("state", "=", "started")),
             failed: await jobs(b => b.select("error").where("state", "=", "failed")),
             queued: await jobs(b => b.whereNull("state").limit(10), "asc"),

@@ -3,7 +3,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, Container, Tabs, Tab, Box } from "@mui/material";
@@ -25,10 +25,8 @@ function App() {
                     <Tab value="channel" label="Channels" />
                 </Tabs>
             </Box>
-            <Suspense>
-                {tab === "job" && <JobView />}
-                {tab === "channel" && <ChannelView />}
-            </Suspense>
+            {tab === "job" && <JobView />}
+            {tab === "channel" && <ChannelView />}
         </Container>
     );
 }

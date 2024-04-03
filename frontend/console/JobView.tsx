@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useAsync } from "react-async-hook";
 import numeral from "numeral";
 import {
     Stack, Paper, Dialog, DialogTitle, DialogActions, DialogContent, Link,
@@ -16,7 +17,7 @@ function JobCard({ job, onRetry }: { job: API.Job, onRetry?: (job: API.Job) => a
         failed: "error" as const,
         success: "success" as const,
     };
-    const stale = job.state === "started" && (Date.now() - job.lastUpdate) > 60000;
+    const stale = job.state === "started" && (Date.now() - job.lastUpdate) > 180_000;
     const allowRetry = stale || job.state === "failed";
     return (
         <Paper sx={{ padding: 2 }}>
@@ -60,35 +61,63 @@ function JobCard({ job, onRetry }: { job: API.Job, onRetry?: (job: API.Job) => a
     );
 }
 
+const jobsDefault = { // static object
+    queueLen: "0", started: [], failed: [], queued: [], recent: [],
+}
+
+const statsDefault = { // static object
+    size: { db: "0" },
+    count: { channel: 0, job: 0, msg: 0 },
+}
+
 export default function JobView() {
-    const [refetch, setRefetch] = useState(false);
-    const stats = API.stats({ refetch });
-    const jobs = API.jobs({ refetch });
+    const statsReq = useAsync(API.stats, []);
+    const jobsReq = useAsync(API.jobs, []);
     const [newJob, setNewJob] = useState<{} | { scrape: true } | { channel: string } | { video: string }>({});
     const [submittingJob, setSubmittingJob] = useState(false);
 
     function reload() {
-        setRefetch(true);
-        stats.reload();
-        jobs.reload();
+        statsReq.reset();
+        statsReq.execute();
+        jobsReq.reset();
+        jobsReq.execute();
     }
 
-    const { queueLength, queued, started, failed, recent } = jobs;
-    
+    useEffect(() => {
+        if(jobsReq.error) enqueueSnackbar(
+            `Failed to fetch jobs: ${jobsReq.error?.message || jobsReq.error}`,
+            { variant: "error" }
+        );
+    }, [jobsReq.error]);
 
+    const jobsPrev = useRef<typeof jobsReq.result>(null);
+    const jobs = useMemo(() => {
+        if(jobsReq.result) jobsPrev.current = jobsReq.result;
+        return jobsReq.result || jobsPrev.current || jobsDefault;
+    }, [jobsReq.result]);
+
+    const statsPrev = useRef<typeof statsReq.result>(null);
+    const stats = useMemo(() => {
+        if(statsReq.result) statsPrev.current = statsReq.result;
+        return statsReq.result || statsPrev.current || statsDefault;
+    }, [statsReq.result]);
+
+    const { queueLen, queued, started, failed, recent } = jobs;
+    
     useEffect(() => { // Auto-reload if something updated in the last minute
         const allJobs = [...queued, ...started, ...failed, ...recent];
         const latestUpdate = allJobs.reduce((acc, j) => Math.max(acc, j.lastUpdate), 0);
-        if ((Date.now() - latestUpdate) < 60000) {
-            setTimeout(reload, 3000);
+        if ((Date.now() - latestUpdate) < 180_000) {
+            setTimeout(reload, 5000);
         }
-    }, [jobs.k]);
+    }, [jobs]);
 
     async function submitJob(job) {
         setSubmittingJob(true);
         try {
             await API.submitJob(job);
-            jobs.reload();
+            jobsReq.reset();
+            jobsReq.execute();
             enqueueSnackbar("Job submitted");
         } catch (err) {
             enqueueSnackbar(`Failed: ${err?.message || err}`, { variant: "error" });
@@ -132,7 +161,7 @@ export default function JobView() {
                 <Paper sx={{ height: 60 }} elevation={3}>
                     <Stack direction="row" spacing={1} alignItems="center" sx={{ height: "100%", padding: 2 }}>
                         <Loop />
-                        <Typography>Queue ({queueLength})</Typography>
+                        <Typography>Queue ({queueLen})</Typography>
                         <Box sx={{ flex: 1 }} />
                         <IconButton onClick={() => setNewJob({ video: "" })} sx={{ justifySelf: "flex-end" }}>
                             <AddBox />
