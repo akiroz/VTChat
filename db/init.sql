@@ -5,8 +5,9 @@ grant connect on database "livechat" to "livechatApp";
 grant connect, create on database "livechat" to "livechatWorker";
 
 \c "livechat";
-create extension pgcrypto;
-create extension pgroonga;
+create extension if not exists pgcrypto;
+create extension if not exists pgroonga;
+create extension if not exists timescaledb cascade;
 
 grant select on pg_class to "livechatApp";
 alter default privileges in schema "public" grant select, insert, update, delete on tables to "livechatApp";
@@ -54,17 +55,19 @@ create index on "job" using btree ("lastUpdate" desc);
 create index on "job" using btree ("state");
 
 create table "msg" (
-    "id" text primary key,
+    "id" text not null,
     "type" "msgType" not null,
     "video" text not null,
     "channel" text not null references "channel"("id"),
     "timestamp" timestamp not null,
     "timecode" int not null, -- sec, relative to start of video
-    "text" text not null
+    "text" text not null,
+    primary key ("id", "timestamp")
 );
 
-create index on "msg" using hash ("channel");
+select create_hypertable('msg', 'timestamp', chunk_time_interval => interval '7 day', migrate_data => true);
 create index on "msg" using btree ("timestamp");
+create index on "msg" using hash ("channel");
 create index on "msg" using pgroonga ("text");
 
 ----------------------------------------------------------------

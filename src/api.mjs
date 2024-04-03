@@ -144,13 +144,15 @@ export async function init() {
                 type: "object", // Key = Tag
                 additionalProperties: { const: 1 }
             },
-            before: { type: "integer" }, // Timestamp sec
+            weekOf: { type: "integer" }, // Timestamp sec, automatically normalized to ISO week
             limit: { type: "integer", minimum: 1, maximum: 100 },
             offset: { type: "integer", minimum: 0 },
         },
         required: ["q"],
     }), async ctx => {
-        const { q, ch, tags, before, limit = 100, offset = 0 } = ctx.request.body;
+        const { q, ch, tags, weekOf = Math.floor(Date.now()/1000), limit = 100, offset = 0 } = ctx.request.body;
+
+        
 
         const b = knex("msg")
             .select("msg.type", "msg.video", "msg.channel", "msg.timecode", "msg.text")
@@ -198,8 +200,8 @@ export async function init() {
     mgnt.get("/stats", async ctx => {
         const { dbSize } = await db.one(`select pg_database_size('livechat') as "dbSize"`);
         const { channelCount } = await db.one(`select count(*)::int as "channelCount" from "channel"`);
-        const { reltuples: jobCount } = await db.one(`select reltuples from pg_class where oid = to_regclass('public.job')`);
-        const { reltuples: msgCount } = await db.one(`select reltuples from pg_class where oid = to_regclass('public.msg')`);
+        const { jobCount } = await db.one(`select reltuples as "jobCount" from pg_class where oid = to_regclass('public.job')`);
+        const { msgCount } = await db.one(`select approximate_row_count('msg') as "msgCount"`);
         ctx.body = {
             size: { db: dbSize },
             count: {
