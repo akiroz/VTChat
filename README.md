@@ -12,7 +12,11 @@ Live demo: [https://akiroz.github.io/vtchat](https://akiroz.github.io/vtchat)
 
 ## Future work
 
-Support video audio transcription generation & indexing via VAD/TTS pipeline.
+- Support video audio transcription generation & indexing via VAD/TTS pipeline
+- Improve search UI
+    - Automatically seek to week with results
+    - Change search term in results page
+- Improve Japanese searching (e.g. hiragana <> katakana)
 
 ## Development
 
