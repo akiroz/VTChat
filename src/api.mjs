@@ -139,7 +139,7 @@ export async function init() {
     api.post("/search", paramSchema({
         type: "object",
         properties: {
-            q: { type: "string", minLength: 2 },
+            q: { type: "string", minLength: 1 },
             ch: { type: "string" }, // Channel ID
             tags: {
                 type: "object", // Key = Tag

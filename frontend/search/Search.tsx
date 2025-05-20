@@ -47,7 +47,7 @@ export default function Search() {
             <Stack direction="row" spacing={2} alignItems="center" sx={{ width: 600 }}>
                 <TextField label={t("keyword")} sx={{ width: "100%" }} value={search.q}
                     onChange={e => setSearch({ ...search, q: e.target.value })} />
-                <Button variant="contained" disabled={search.q.length < 2} onClick={() => {
+                <Button variant="contained" disabled={search.q.length < 1} onClick={() => {
                     const { weekOf, ...rest } = search;
                     const params = { ...rest, ...(Number.isInteger(weekOf)? { wk: String(weekOf) }: {}) };
                     navigate({ pathname: "/search", search: createSearchParams(params).toString() });

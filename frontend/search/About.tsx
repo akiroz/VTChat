@@ -18,6 +18,9 @@ export default function About() {
             <Typography variant="h5">Latest Updates</Typography>
             <Divider />
             <Typography sx={{ margin: 3 }}>
+                <b>2025-05-20: </b>
+                Allow single character search. Changing search term within results page. Added continuous seek feature up to 12 weeks.
+                <br />
                 <b>2024-04-02: </b>
                 Initial release of VTChat 🎉 Tracked channels include all of the currently active <Link href="https://x.com/sainexxx">Saine sisters </Link>
                 along with all vtubers affliated with the groups MEWLIVE, Specialite, and Varium. Happy searching!

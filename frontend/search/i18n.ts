@@ -31,6 +31,7 @@ i18next.use(LanguageDetector).use(initReactI18next).init({
                 desc: "Search chat messages in VTuber livestreams",
                 noResult: "No results found.",
                 result: "Showing {{n}} results for:",
+                searching: "Searching:",
                 page: "{{y}} Week {{w}} ({{mmm}}) Page {{n}}"
             },
         },
@@ -46,7 +47,7 @@ i18next.use(LanguageDetector).use(initReactI18next).init({
                     systemStatus: "システム状態",
                 },
                 keyword: "キーワード",
-                search: "検査",
+                search: "検索",
                 advancedSearch: "検索オプション",
                 channel: "チャンネル",
                 weekOf: "週間検索範囲",
@@ -54,6 +55,7 @@ i18next.use(LanguageDetector).use(initReactI18next).init({
                 desc: "VTuber配信コメント検査",
                 noResult: "結果はありません。",
                 result: "ページ結果 {{n}} 件",
+                searching: "検索中：",
                 page: "{{y}}週{{w}} ({{m}}月) ページ {{n}}"
             },
         },

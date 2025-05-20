@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
         root: APP || "search",
         base: APP === "console"? "/mgnt/": "/vtchat/",
         define: {
-            __VTCHAT_API_BASE__: JSON.stringify(mode === "production"? "https://vtchat.akiroz.life": "http://localhost:3000"),
+            __VTCHAT_API_BASE__: JSON.stringify(mode === "production"? "https://vtchat.akiroz.life": "https://vtchat.akiroz.life"),
         },
         build: {
             outDir: `../dist_${APP || "search"}`,
