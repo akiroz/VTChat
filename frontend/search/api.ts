@@ -20,7 +20,7 @@ export async function csearch({ q }): Promise<Array<{
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ q, limit: 5 }),
+        body: JSON.stringify({ q, limit: 20 }),
     });
     if(resp.status >= 400) throw Error((await resp.text()) || resp.statusText);
     const { channels } = await resp.json();

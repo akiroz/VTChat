@@ -173,7 +173,7 @@ export async function init() {
     api.post("/csearch", paramSchema({
         type: "object",
         properties: {
-            q: { type: "string", minLength: 2 },
+            q: { type: "string" },
             limit: { type: "integer", minimum: 1, maximum: 30 },
             offset: { type: "integer", minimum: 0 },
         },
@@ -181,7 +181,7 @@ export async function init() {
         const { q, limit = 10, offset = 0 } = ctx.request.body;
         const b = knex("channel")
             .select("id", { name: "nameNative" }, "thumbnail", "tags", "active")
-            .orderBy("nameNative").limit(limit).offset(offset);
+            .orderBy("lastStream", "desc").limit(limit).offset(offset);
         if(q && q.length > 1) b.whereRaw(`"nameAll" &@ ?`, q);
         const { sql, bindings } = b.toSQL().toNative();
         ctx.body = {

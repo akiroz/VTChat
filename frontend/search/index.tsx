@@ -5,7 +5,7 @@ import "@fontsource/roboto/700.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SnackbarProvider } from "notistack";
 
@@ -30,14 +30,12 @@ import Faq from "./Faq";
 const root = createRoot(document.querySelector("main"));
 const theme = createTheme({ palette: { mode: "dark" } });
 
-const router = createBrowserRouter([
+const router = createHashRouter([
     { path: "/", element: <Search /> },
     { path: "/search", element: <Results /> },
     { path: "/about", element: <About /> },
     { path: "/faq", element: <Faq /> },
-], {
-    basename: "/vtchat"
-});
+]);
 
 function App() {
     const { t, i18n } = useTranslation();

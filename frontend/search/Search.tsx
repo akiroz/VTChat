@@ -24,14 +24,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import * as API from "./api";
 
 async function csearch(q: string): ReturnType<typeof API.csearch> {
-    if (q.length < 2) return [];
     return API.csearch({ q });
 }
 
 export default function Search() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const tags = useAsync(API.tags, []);
+    // const tags = useAsync(API.tags, []);
 
     const [chQuery, setChQuery] = useState("");
     const [chQuery2] = useDebounce(chQuery, 800);
@@ -61,7 +60,7 @@ export default function Search() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Autocomplete
-                        options={(chQuery.length > 1 && channels.result) || []}
+                        options={channels.result || []}
                         loading={channels.loading}
                         isOptionEqualToValue={(a, b) => a?.id === b?.id}
                         onChange={(_e, value) => {
@@ -81,13 +80,13 @@ export default function Search() {
                             </Box>
                         )}
                     />
-                    <Autocomplete
+                    {/* <Autocomplete
                         options={tags.result || []}
                         sx={{ marginTop: 2, }}
                         value={search.tag || null}
                         onChange={(_e, value) => setSearch({ ...search, tag: value })}
                         renderInput={(props) => <TextField {...props} label={t("tags")} />}
-                    />
+                    /> */}
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
                             sx={{ marginTop: 2 }}

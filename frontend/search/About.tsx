@@ -18,6 +18,9 @@ export default function About() {
             <Typography variant="h5">Latest Updates</Typography>
             <Divider />
             <Typography sx={{ margin: 3 }}>
+                <b>2025-07-05: </b>
+                Added initial channel suggestions for advanced search.
+                <br />
                 <b>2025-05-20: </b>
                 Allow single character search. Changing search term within results page. Added continuous seek feature up to 12 weeks.
                 <br />
