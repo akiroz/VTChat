@@ -26,7 +26,7 @@ export default function About() {
                 <br />
                 <b>2024-04-02: </b>
                 Initial release of VTChat 🎉 Tracked channels include all of the currently active <Link href="https://x.com/sainexxx">Saine sisters </Link>
-                along with all vtubers affliated with the groups MEWLIVE, Specialite, and Varium. Happy searching!
+                along with some vtubers affliated with the groups such as MEWLIVE. Happy searching!
             </Typography>
         </>
     );
