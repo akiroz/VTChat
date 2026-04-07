@@ -327,12 +327,14 @@ export async function init() {
     });
 
     if(productionMode) {
-        const { VTCHAT_API_CERT, VTCHAT_API_KEY } = process.env;
+        const { VTCHAT_API_CERT, VTCHAT_API_KEY, VTCHAT_PORT } = process.env;
         const cert = await readFile(VTCHAT_API_CERT || (() => { throw Error("VTCHAT_API_CERT not set") })());
         const key = await readFile(VTCHAT_API_KEY || (() => { throw Error("VTCHAT_API_KEY not set") })());
-        https.createServer({ cert, key }, app.callback()).listen(443);
+        let port = Number(VTCHAT_PORT);
+        if(!(Number.isInteger(port) && port > 0)) port = 443;
+        https.createServer({ cert, key }, app.callback()).listen(port);
     } else {
-        let port = Number(process.env.PORT);
+        let port = Number(process.env.VTCHAT_PORT);
         if(!(Number.isInteger(port) && port > 0)) port = 3000;
         return app.listen(port, () => log.info("server started", { port }));
     }

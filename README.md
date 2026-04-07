@@ -38,6 +38,7 @@ The backend process denpends on several environment variables which can be set i
 - `VTCHAT_YT_KEY` YouTube API key (always required)
 - `VTCHAT_API_CERT` HTTPS X.509 cert path
 - `VTCHAT_API_KEY` HTTPS X.509 key path
+- `VTCHAT_PORT` HTTPS Server Port
 
 Authenticated APIs uses basic auth with keys as username, auth header should be formatted as follows:
 ```
